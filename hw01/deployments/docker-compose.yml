@@ -1,0 +1,8 @@
+version: "3"
+services:
+  health:
+    image: astrviktor/health:1.0.0
+    container_name: health
+    ports:
+      - "8000:8000"
+
