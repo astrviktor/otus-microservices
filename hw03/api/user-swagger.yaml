@@ -1,0 +1,141 @@
+swagger: '2.0'
+info:
+  contact:
+    email: schetinnikov@gmail.com
+  description: |
+    This is simple client API
+  title: User Service
+  version: 1.0.0
+host: example.domain
+basePath: /api/v1/
+schemes:
+  - http
+paths:
+  /user:
+    post:
+      consumes:
+        - application/json
+      parameters:
+        - description: Created user object
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        default:
+          description: successful operation
+      tags:
+        - user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      summary: Create user
+  '/user/{userId}':
+    parameters:
+      - description: ID of user
+        format: int64
+        in: path
+        name: userId
+        required: true
+        type: integer
+    delete:
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '204':
+          description: user deleted
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - user
+      description: deletes a single user based on the ID supplied
+      operationId: deleteUser
+    get:
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        '200':
+          description: user response
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - user
+      description: >-
+        Returns a user based on a single ID, if the user does not have access to
+        the user
+      operationId: find user by id
+    put:
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/User'
+      responses:
+        '200':
+          description: user updated
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+      tags:
+        - user
+      description: Update user with User ID supplied
+      operationId: updateUser
+definitions:
+  Error:
+    properties:
+      code:
+        format: int32
+        type: integer
+      message:
+        type: string
+    required:
+      - code
+      - message
+    type: object
+  User:
+    properties:
+      email:
+        format: email
+        type: string
+      firstName:
+        type: string
+      id:
+        format: int64
+        type: integer
+      lastName:
+        type: string
+      phone:
+        format: phone
+        type: string
+      username:
+        maxLength: 256
+        type: string
+    type: object
+tags:
+  - description: Operations about user
+    name: user
+x-components:
+  requestBodies:
+    UserArray:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/definitions/User'
+            type: array
+      description: List of user object
+      required: true
+

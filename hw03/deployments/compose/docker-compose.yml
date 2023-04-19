@@ -1,0 +1,43 @@
+version: "2.1"
+services:
+  crudservice:
+    image: astrviktor/crudservice:1.0.0
+#    build: ../../docker
+    container_name: crudservice
+    volumes:
+      - ../../configs/config.yaml:/etc/crudservice/config.yaml
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      docker:
+
+  postgres:
+    image: postgres:15.1-bullseye
+    container_name: postgres
+    environment:
+      POSTGRES_DB: "users"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      TZ: 'UTC'
+      PGTZ: 'UTC'
+    volumes:
+      - volume_postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      docker:
+
+volumes:
+  volume_postgres:
+
+networks:
+  docker:
+    driver: bridge

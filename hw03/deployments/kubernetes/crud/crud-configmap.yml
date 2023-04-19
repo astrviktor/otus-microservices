@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crudservice-config
+  namespace: crud
+data:
+  config.yaml: |
+    server:
+      host:
+      port: 8000
+    storage:
+      host: storage-postgresql.storage.svc.cluster.local
+      port: 5432
+      scheme: users

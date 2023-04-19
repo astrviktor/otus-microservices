@@ -1,0 +1,9 @@
+server:
+  host:
+  port: 8000
+storage:
+  host: postgres
+  port: 5432
+  scheme: users
+  user: user
+  password: password

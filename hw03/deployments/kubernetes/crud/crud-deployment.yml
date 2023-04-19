@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crudservice
+  namespace: crud
+  labels:
+    app: crudservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: crudservice
+  template:
+    metadata:
+      name: crudservice
+      labels:
+        app: crudservice
+    spec:
+      containers:
+        - image: astrviktor/crudservice:1.0.2
+          name: crudservice
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            periodSeconds: 30
+            failureThreshold: 15
+            successThreshold: 1
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 15
+            successThreshold: 1
+            timeoutSeconds: 2
+            initialDelaySeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "16Mi"
+            limits:
+              cpu: "200m"
+              memory: "64Mi"
+          volumeMounts:
+            - name: crudservice-config
+              mountPath: /etc/crudservice/config.yaml
+              subPath: config.yaml
+          env:
+            - name: CRUDSERVICE_STORAGE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: crudservice-secret
+                  key: user
+            - name: CRUDSERVICE_STORAGE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: crudservice-secret
+                  key: password
+      volumes:
+        - name: crudservice-config
+          configMap:
+            name: crudservice-config
