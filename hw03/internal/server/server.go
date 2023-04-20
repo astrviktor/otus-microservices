@@ -37,6 +37,9 @@ func New(cfg config.Config, log *zap.Logger) (*Server, error) {
 	}
 
 	r := router.New()
+
+	r.GET("/metrics", handler.Metrics)
+
 	r.GET("/health/", middleware.Logging(log, handler.HandleHealth))
 
 	r.POST("/user", middleware.Logging(log, handler.CreateUser))

@@ -1,7 +1,7 @@
 version: "2.1"
 services:
   crudservice:
-    image: astrviktor/crudservice:1.0.0
+    image: astrviktor/crudservice:1.1.0
 #    build: ../../docker
     container_name: crudservice
     volumes:
@@ -13,6 +13,8 @@ services:
         condition: service_healthy
     networks:
       docker:
+        aliases:
+          - crudservice
 
   postgres:
     image: postgres:15.1-bullseye
@@ -34,6 +36,73 @@ services:
       retries: 5
     networks:
       docker:
+        aliases:
+          - postgres
+
+  prometheus:
+    image: prom/prometheus:v2.43.0
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    container_name: prometheus
+    hostname: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Moscow"
+    networks:
+      docker:
+        aliases:
+          - prometheus
+
+  node-exporter:
+    image: prom/node-exporter:v1.5.0
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    container_name: node-exporter
+    hostname: node-exporter
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.ignored-mount-points
+      - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+    ports:
+      - 9100:9100
+    expose:
+      - 9100
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Moscow"
+    labels:
+      org.label-schema.group: "monitoring"
+    networks:
+      docker:
+        aliases:
+          - node-exporter
+
+  grafana:
+    image: grafana/grafana:9.4.7
+    user: root
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+#    volumes:
+#      - ./grafana:/var/lib/grafana
+#      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    container_name: grafana
+    hostname: grafana
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Moscow"
+    networks:
+      docker:
+        aliases:
+          - grafana
 
 volumes:
   volume_postgres:

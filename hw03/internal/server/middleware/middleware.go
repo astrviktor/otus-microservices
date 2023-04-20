@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/VictoriaMetrics/metrics"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
+	"strconv"
 	"time"
 )
 
@@ -21,6 +23,14 @@ func Logging(log *zap.Logger, h fasthttp.RequestHandler) fasthttp.RequestHandler
 			zap.ByteString("request_body", ctx.Request.Body()),
 			zap.Int64("duration", time.Since(start).Milliseconds()),
 		)
+
+		metrics.GetOrCreateHistogram(
+			fmt.Sprintf("request_duration_ms{method=%q,path=%q,status=%q}",
+				string(ctx.Method()),
+				string(ctx.Path()),
+				strconv.Itoa(ctx.Response.StatusCode()),
+			),
+		).UpdateDuration(start)
 
 		//log.Println(ip, r.Method, r.RequestURI, r.Proto, recorder.Status, duration, userAgent)
 	}

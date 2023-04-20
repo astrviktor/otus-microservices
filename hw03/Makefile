@@ -42,7 +42,7 @@ compose_down:
 
 
 # docker build image and push to dockerhub
-DOCKER_IMG="astrviktor/crudservice:1.0.2"
+DOCKER_IMG="astrviktor/crudservice:1.1.0"
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
@@ -57,3 +57,23 @@ docker_build:
 docker_push:
 	@docker push $(DOCKER_IMG)
 
+
+# helm install and uninstall
+
+helm_install:
+	@helm install storage-pvc ./deployments/kubernetes/helm-charts/storage-pvc/
+	@sleep 10
+	@helm install storage ./deployments/kubernetes/helm-charts/postgres/ \
+       --set persistence.existingClaim=postgresql-pv-claim \
+       --set volumePermissions.enabled=true \
+       --set auth.postgresPassword=password \
+       --set auth.database=users
+	@sleep 60
+	@helm install crudservice ./deployments/kubernetes/helm-charts/crudservice/
+
+helm_uninstall:
+	@helm uninstall crudservice
+	@sleep 10
+	@helm uninstall storage
+	@sleep 10
+	@helm uninstall storage-pvc

@@ -3,13 +3,16 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/VictoriaMetrics/metrics"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
 	"log"
+	"math/rand"
 	"otus-microservices/hw03/internal/config"
 	"otus-microservices/hw03/internal/storage"
 	storagegorm "otus-microservices/hw03/internal/storage/gorm"
 	"strconv"
+	"time"
 )
 
 type Handler struct {
@@ -57,7 +60,17 @@ func WriteResponse(ctx *fasthttp.RequestCtx, resp interface{}) {
 	ctx.SetContentType("application/json; charset=utf-8")
 }
 
+func (h *Handler) Metrics(ctx *fasthttp.RequestCtx) {
+	metrics.WritePrometheus(ctx.Response.BodyWriter(), true)
+}
+
 func (h *Handler) HandleHealth(ctx *fasthttp.RequestCtx) {
+	n := rand.Intn(800) + 200 // n will be between 200 and 1000
+
+	h.log.Info(fmt.Sprintf("[Health] sleeping %d millisecond", n))
+
+	time.Sleep(time.Duration(n) * time.Millisecond)
+
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	WriteResponse(ctx, &ResponseHealth{Status: "OK"})
 

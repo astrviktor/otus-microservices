@@ -129,7 +129,42 @@ sudo nano /etc/hosts
 192.168.49.2    arch.homework
 ```
 
-### Проверка
+### Установка через helm или Makefile
+
+```
+helm install storage-pvc ./deployments/kubernetes/helm-charts/storage-pvc/
+
+helm install storage ./deployments/kubernetes/helm-charts/postgres/ \
+       --set persistence.existingClaim=postgresql-pv-claim \
+       --set volumePermissions.enabled=true \
+       --set auth.postgresPassword=password \
+       --set auth.database=users
+
+helm install crudservice ./deployments/kubernetes/helm-charts/crudservice/
+
+или
+
+make helm_install
+
+При установке через make добавлены таймауты между операциями, чтобы k8s успевал их обработать
+
+```
+
+### Проверка сервисов
+
+```
+kubectl get all
+
+Поды должны быть в Running статусе
+
+NAME                              READY   STATUS    RESTARTS   AGE
+pod/crudservice-78fc75f5d-5pfnc   1/1     Running   0          28s
+pod/crudservice-78fc75f5d-9kb7x   1/1     Running   0          28s
+pod/storage-postgresql-0          1/1     Running   0          89s
+```
+
+
+### Проверка API
 ```
 # запрос
 curl --request GET 'http://arch.homework/health/'
@@ -178,6 +213,17 @@ curl --request GET 'http://arch.homework/user/1'
 
 # ответ
 record not found
+```
+
+### Удаление через helm или Makefile
+```
+helm uninstall crudservice
+helm uninstall storage
+helm uninstall storage-pvc
+
+или
+
+make helm_uninstall
 ```
 
 ### Удаление minikube
