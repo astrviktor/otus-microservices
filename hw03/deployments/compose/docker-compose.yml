@@ -1,13 +1,21 @@
 version: "2.1"
 services:
   crudservice:
-    image: astrviktor/crudservice:1.1.0
+    image: astrviktor/crudservice:1.1.1
 #    build: ../../docker
     container_name: crudservice
+    hostname: crudservice
     volumes:
       - ../../configs/config.yaml:/etc/crudservice/config.yaml
     ports:
       - "8000:8000"
+    links:
+      - fluentd
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: crudservice
     depends_on:
       postgres:
         condition: service_healthy
@@ -86,6 +94,7 @@ services:
 
   grafana:
     image: grafana/grafana:9.4.7
+    container_name: grafana
     user: root
     depends_on:
       - prometheus
@@ -94,7 +103,6 @@ services:
 #    volumes:
 #      - ./grafana:/var/lib/grafana
 #      - ./grafana/provisioning/:/etc/grafana/provisioning/
-    container_name: grafana
     hostname: grafana
     restart: unless-stopped
     environment:
@@ -103,6 +111,69 @@ services:
       docker:
         aliases:
           - grafana
+
+  fluentd:
+    build: ./fluentd
+    container_name: fluentd
+    volumes:
+      - ./fluentd/conf:/fluentd/etc
+    links:
+      - "elasticsearch"
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    depends_on:
+      - elasticsearch
+    networks:
+      docker:
+        aliases:
+          - fluentd
+
+  elasticsearch:
+    image: elasticsearch:7.4.0
+    container_name: elasticsearch
+    environment:
+      - ELASTIC_CLUSTER=false
+      - CLUSTER_NODE_MASTER=true
+      - CLUSTER_MASTER_NODE_NAME=es01
+      - discovery.type=single-node
+    expose:
+      - 9200
+    ports:
+      - "9200:9200"
+    networks:
+      docker:
+        aliases:
+          - elasticsearch
+
+
+  kibana:
+    image: kibana:7.4.0
+    container_name: kibana
+    links:
+      - "elasticsearch"
+    ports:
+      - "5601:5601"
+    networks:
+      docker:
+        aliases:
+          - kibana
+
+  yandex-tank:
+    #    image: direvius/yandex-tank
+    build: ./yandex-tank
+    #    entrypoint: /bin/bash
+    depends_on:
+      - crudservice
+    volumes:
+      - ./yandex-tank/testing.yaml:/var/loadtest/testing.yaml
+      - ./yandex-tank/testing.sh:/var/loadtest/testing.sh
+    container_name: yandex-tank
+    networks:
+      docker:
+        aliases:
+          - yandex-tank
+
 
 volumes:
   volume_postgres:

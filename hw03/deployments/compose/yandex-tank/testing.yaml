@@ -1,0 +1,28 @@
+phantom:
+  enabled: true
+#  package: yandextank.plugins.Phantom
+  address: crudservice:8000
+  timeout: 60s
+  header_http: "1.1"
+  headers:
+    - "[Host: crudservice:8000]"
+    - "[User-Agent: Tank]"
+    - "[Connection: close]"
+  uris:
+    - /testing
+  #  ammofile: /var/loadtest/get.txt
+#  ammo_type: uriget
+#  writelog: 0
+  load_profile:
+    load_type: rps
+    schedule: line(10, 100, 1m)
+#    schedule: const(10, 1m)
+#  header_http: "1.1"
+#  uris:
+#    - "/segment/10000"
+console:
+  enabled: true # enable console output
+telegraf:
+  enabled: false # let's disable telegraf monitoring for the first time
+#uploader:
+#  enabled: false

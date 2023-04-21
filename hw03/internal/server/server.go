@@ -41,6 +41,7 @@ func New(cfg config.Config, log *zap.Logger) (*Server, error) {
 	r.GET("/metrics", handler.Metrics)
 
 	r.GET("/health/", middleware.Logging(log, handler.HandleHealth))
+	r.GET("/testing", middleware.Logging(log, handler.HandleTesting))
 
 	r.POST("/user", middleware.Logging(log, handler.CreateUser))
 	r.GET("/user/{id}", middleware.Logging(log, handler.ReadUser))
@@ -49,6 +50,8 @@ func New(cfg config.Config, log *zap.Logger) (*Server, error) {
 
 	srv := &fasthttp.Server{
 		Handler: r.Handler,
+		//MaxRequestsPerConn: 10,
+		//MaxConnsPerIP:      2,
 	}
 
 	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)

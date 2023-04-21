@@ -42,7 +42,7 @@ compose_down:
 
 
 # docker build image and push to dockerhub
-DOCKER_IMG="astrviktor/crudservice:1.1.0"
+DOCKER_IMG="astrviktor/crudservice:1.1.1"
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)
@@ -77,3 +77,8 @@ helm_uninstall:
 	@helm uninstall storage
 	@sleep 10
 	@helm uninstall storage-pvc
+
+
+# connect to yandex tank
+yandex_tank:
+	docker exec -it yandex-tank /bin/bash

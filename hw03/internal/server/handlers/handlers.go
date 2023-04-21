@@ -65,15 +65,32 @@ func (h *Handler) Metrics(ctx *fasthttp.RequestCtx) {
 }
 
 func (h *Handler) HandleHealth(ctx *fasthttp.RequestCtx) {
-	n := rand.Intn(800) + 200 // n will be between 200 and 1000
-
-	h.log.Info(fmt.Sprintf("[Health] sleeping %d millisecond", n))
-
-	time.Sleep(time.Duration(n) * time.Millisecond)
-
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	WriteResponse(ctx, &ResponseHealth{Status: "OK"})
 
+	return
+}
+
+func (h *Handler) HandleTesting(ctx *fasthttp.RequestCtx) {
+	delay := rand.Intn(800) + 200
+	h.log.Info(fmt.Sprintf("[Testing] sleeping %d millisecond", delay))
+	time.Sleep(time.Duration(delay) * time.Millisecond)
+
+	code := [...]int{
+		fasthttp.StatusOK,
+		fasthttp.StatusOK,
+		fasthttp.StatusOK,
+		fasthttp.StatusOK,
+		fasthttp.StatusOK,
+		fasthttp.StatusOK,
+		fasthttp.StatusBadRequest,
+		fasthttp.StatusNotFound,
+		fasthttp.StatusNotFound,
+		fasthttp.StatusInternalServerError,
+	}
+	idx := rand.Intn(10)
+
+	ctx.SetStatusCode(code[idx])
 	return
 }
 
