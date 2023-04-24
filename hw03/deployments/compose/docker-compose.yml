@@ -1,7 +1,7 @@
 version: "2.1"
 services:
   crudservice:
-    image: astrviktor/crudservice:1.1.1
+    image: astrviktor/crudservice:1.1.3
 #    build: ../../docker
     container_name: crudservice
     hostname: crudservice

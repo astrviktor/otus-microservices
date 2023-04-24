@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/VictoriaMetrics/metrics"
 	"github.com/valyala/fasthttp"
 	"go.uber.org/zap"
+	"otus-microservices/hw03/internal/server/prometheus"
 	"strconv"
 	"time"
 )
@@ -24,13 +24,19 @@ func Logging(log *zap.Logger, h fasthttp.RequestHandler) fasthttp.RequestHandler
 			zap.Int64("duration", time.Since(start).Milliseconds()),
 		)
 
-		metrics.GetOrCreateHistogram(
-			fmt.Sprintf("request_duration_ms{method=%q,path=%q,status=%q}",
-				string(ctx.Method()),
-				string(ctx.Path()),
-				strconv.Itoa(ctx.Response.StatusCode()),
-			),
-		).UpdateDuration(start)
+		//metrics.GetOrCreateHistogram(
+		//	fmt.Sprintf("request_duration_ms{method=%q,path=%q,status=%q}",
+		//		string(ctx.Method()),
+		//		string(ctx.Path()),
+		//		strconv.Itoa(ctx.Response.StatusCode()),
+		//	),
+		//).UpdateDuration(start)
+
+		prometheus.Metrics.ResponseTime.WithLabelValues(
+			string(ctx.Method()),
+			string(ctx.Path()),
+			strconv.Itoa(ctx.Response.StatusCode()),
+		).Observe(float64(time.Since(start).Milliseconds()))
 
 		//log.Println(ip, r.Method, r.RequestURI, r.Proto, recorder.Status, duration, userAgent)
 	}

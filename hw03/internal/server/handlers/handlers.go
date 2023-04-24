@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/VictoriaMetrics/metrics"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/valyala/fasthttp"
+	"github.com/valyala/fasthttp/fasthttpadaptor"
 	"go.uber.org/zap"
 	"log"
 	"math/rand"
@@ -58,6 +60,10 @@ func WriteResponse(ctx *fasthttp.RequestCtx, resp interface{}) {
 	//}
 
 	ctx.SetContentType("application/json; charset=utf-8")
+}
+
+func (h *Handler) PrometheusHandler() fasthttp.RequestHandler {
+	return fasthttpadaptor.NewFastHTTPHandler(promhttp.Handler())
 }
 
 func (h *Handler) Metrics(ctx *fasthttp.RequestCtx) {

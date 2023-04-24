@@ -11,6 +11,7 @@ import (
 	"otus-microservices/hw03/internal/config"
 	"otus-microservices/hw03/internal/server/handlers"
 	"otus-microservices/hw03/internal/server/middleware"
+	"otus-microservices/hw03/internal/server/prometheus"
 	"sync"
 	"time"
 )
@@ -36,9 +37,12 @@ func New(cfg config.Config, log *zap.Logger) (*Server, error) {
 		return nil, err
 	}
 
+	prometheus.NewPrometheus()
+
 	r := router.New()
 
-	r.GET("/metrics", handler.Metrics)
+	//r.GET("/metrics", handler.Metrics)
+	r.GET("/metrics", handler.PrometheusHandler())
 
 	r.GET("/health/", middleware.Logging(log, handler.HandleHealth))
 	r.GET("/testing", middleware.Logging(log, handler.HandleTesting))
