@@ -42,7 +42,7 @@ compose_down:
 
 
 # docker build image and push to dockerhub
-DOCKER_IMG="astrviktor/crudservice:1.1.3"
+DOCKER_IMG="astrviktor/crudservice:1.1.4"
 
 GIT_HASH := $(shell git log --format="%h" -n 1)
 LDFLAGS := -X main.release="develop" -X main.buildDate=$(shell date -u +%Y-%m-%dT%H:%M:%S) -X main.gitHash=$(GIT_HASH)

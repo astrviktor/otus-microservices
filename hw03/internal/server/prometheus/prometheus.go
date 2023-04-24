@@ -11,8 +11,8 @@ type MetricsStruct struct {
 func NewPrometheus() {
 	responseTime := prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
-			Name: "response_duration_ms",
-			Help: "response time, ms",
+			Name: "response_duration",
+			Help: "response time, s",
 		},
 		[]string{"method", "path", "code"},
 	)

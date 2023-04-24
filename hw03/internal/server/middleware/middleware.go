@@ -36,7 +36,7 @@ func Logging(log *zap.Logger, h fasthttp.RequestHandler) fasthttp.RequestHandler
 			string(ctx.Method()),
 			string(ctx.Path()),
 			strconv.Itoa(ctx.Response.StatusCode()),
-		).Observe(float64(time.Since(start).Milliseconds()))
+		).Observe(float64(time.Since(start).Milliseconds() / 1000))
 
 		//log.Println(ip, r.Method, r.RequestURI, r.Proto, recorder.Status, duration, userAgent)
 	}
