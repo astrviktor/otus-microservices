@@ -71,6 +71,8 @@ func (h *Handler) Metrics(ctx *fasthttp.RequestCtx) {
 }
 
 func (h *Handler) HandleHealth(ctx *fasthttp.RequestCtx) {
+	time.Sleep(time.Duration(100) * time.Millisecond)
+
 	ctx.SetStatusCode(fasthttp.StatusOK)
 	WriteResponse(ctx, &ResponseHealth{Status: "OK"})
 
