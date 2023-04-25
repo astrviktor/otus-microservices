@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: crudservice-monitor
+  labels:
+    app: crudservice-monitor
+spec:
+  endpoints:
+    - port: api
+      scrapeTimeout: 30s
+      path: /metrics
+      honorLabels: true
+      scheme: http
+  namespaceSelector:
+    matchNames:
+      - default
+  selector:
+    matchLabels:
+      app: crudservice

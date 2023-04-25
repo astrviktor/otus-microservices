@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: crudservice-config
+  namespace: default
+data:
+  config.yaml: |
+    server:
+      host:
+      port: 8000
+    storage:
+      host: storage-postgresql
+      port: 5432
+      scheme: users
+      user: postgres

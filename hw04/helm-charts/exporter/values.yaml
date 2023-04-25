@@ -1,0 +1,28 @@
+config:
+  datasource:
+    # Specify one of both datasource or datasourceSecret
+    host: storage-postgresql
+    user: postgres
+    # Specify passwordSecret if DB password is stored in secret.
+    passwordSecret: {
+      name: storage-postgresql,
+      key: postgres-password
+    }
+    # Secret name
+    #  name:
+    # Password key inside secret
+    #  key:
+    port: "5432"
+    database: 'users'
+    sslmode: disable
+serviceMonitor:
+  enabled: true
+  additionalLabels:
+    release: prometheus
+service:
+  port: 9187
+  targetPort: 9187
+  name: http
+  metadata:
+    labels:
+      release: prometheus
