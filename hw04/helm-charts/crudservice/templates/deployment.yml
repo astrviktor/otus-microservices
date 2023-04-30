@@ -20,6 +20,8 @@ spec:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8000'
         prometheus.io/path: '/metrics'
+        fluentbit.io/exclude: "true"
+        fluentbit.io/parser: 'json'
     spec:
       containers:
         - image: astrviktor/crudservice:1.1.5

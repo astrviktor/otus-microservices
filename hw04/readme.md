@@ -212,3 +212,24 @@ minikube delete
 
 ![Alt text](./pictures/crudservice.jpg?raw=true "")
 
+
+### Установка Victoria Metrics
+```
+https://docs.victoriametrics.com/guides/k8s-monitoring-via-vm-cluster.html
+https://victoriametrics.github.io/helm-charts/
+https://habr.com/ru/articles/568090/
+
+helm repo add vm https://victoriametrics.github.io/helm-charts/
+helm repo update
+
+helm install vm vm/victoria-metrics-k8s-stack \
+  --namespace victoria-metrics --create-namespace
+
+kubectl port-forward service/vmsingle-vm-victoria-metrics-k8s-stack 8429 --namespace=victoria-metrics
+kubectl port-forward service/vm-grafana 3000:80 --namespace=victoria-metrics
+
+kubectl get secret vm-grafana --namespace victoria-metrics -o go-template='
+{{range $k,$v := .data}}{{printf "%s: " $k}}{{if not $v}}{{$v}}{{else}}{{$v | base64decode}}{{end}}{{"\n"}}{{end}}'
+
+helm uninstall vm
+```

@@ -16,3 +16,16 @@
 - https://mcs.mail.ru/docs/additionals/cases/cases-monitoring/case-psql-exporter
 
 - https://habr.com/ru/articles/724524/
+
+- https://stackoverflow.com/questions/61365202/nginx-ingress-service-ingress-nginx-controller-admission-not-found
+
+
+EFK
+
+- https://itsecforu.ru/2021/03/15/%E2%98%B8%EF%B8%8F-%D0%BF%D1%80%D0%BE%D0%B1%D1%80%D0%BE%D1%81-%D0%BB%D0%BE%D0%B3%D0%BE%D0%B2-kubernetes-%D0%B2-elasticsearch-elk-%D1%81-%D0%BF%D0%BE%D0%BC%D0%BE%D1%89%D1%8C%D1%8E-fluentbit/
+
+- https://docs.fluentbit.io/manual/installation/kubernetes#installation
+- https://docs.fluentbit.io/manual/installation/getting-started-with-fluent-bit
+- https://docs.fluentbit.io/manual/pipeline/inputs
+- https://docs.fluentbit.io/manual/pipeline/outputs/elasticsearch
+- https://habr.com/ru/articles/548998/
