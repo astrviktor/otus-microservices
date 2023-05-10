@@ -1,0 +1,34 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor "User"
+participant "Auth service"
+
+    "User" -> "Auth service" : Запрос регистрации POST /profile
+    "Auth service" -> "User" : Успешная регистрация - 200
+
+alt #LightBlue ошибка в \n регистрационных данных
+
+    "Auth service" -> "User" : Ошибка в регистрации - 404
+
+end
+
+    "User" -> "Auth service" : Получение профиля GET /profile
+    "Auth service" -> "User" : Не авторизован - 401
+    "User" -> "Auth service" : Изменение профиля PUT /profile
+    "Auth service" -> "User" : Не авторизован - 401
+
+alt #LightBlue запросы с авторизацией \n для конкретного профиля
+
+    "User" -> "Auth service" : Авторизация POST /login
+    "Auth service" -> "User" : Авторизован - 200
+    "User" -> "Auth service" : Получение профиля GET /profile
+    "Auth service" -> "User" : Профиль получен - 200
+    "User" -> "Auth service" : Изменение профиля PUT /profile
+    "Auth service" -> "User" : Профиль изменен - 200
+    "User" -> "Auth service" : Выход POST /logout
+    "Auth service" -> "User" : Очистка сессии и куки - 200
+
+end
+
+@enduml
