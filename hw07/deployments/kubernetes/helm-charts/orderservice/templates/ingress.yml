@@ -1,0 +1,29 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: orderservice-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: arch.homework
+      http:
+        paths:
+          - pathType: Prefix
+            path: /otusapp/astrviktor/(.*)
+            backend:
+              service:
+                name: orserservice
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: /(.*)
+            backend:
+              service:
+                name: orderservice
+                port:
+                  number: 8000
