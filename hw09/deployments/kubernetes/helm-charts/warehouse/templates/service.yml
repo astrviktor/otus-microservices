@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: warehouse
+  namespace: default
+  labels:
+    app: warehouse
+spec:
+  type: NodePort
+  ports:
+    - nodePort: 30003
+      port: 8002
+      protocol: TCP
+      targetPort: 8002
+      name: warehouse
+  selector:
+    app: warehouse
+

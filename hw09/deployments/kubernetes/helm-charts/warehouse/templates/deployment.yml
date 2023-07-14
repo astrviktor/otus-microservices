@@ -1,0 +1,48 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: warehouse
+  namespace: default
+  labels:
+    app: warehouse
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: warehouse
+  template:
+    metadata:
+      name: warehouse
+      labels:
+        app: warehouse
+    spec:
+      containers:
+        - name: warehouse
+          image: astrviktor/warehouse:1.0.1
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8002
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8002
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+            initialDelaySeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "16Mi"
+            limits:
+              cpu: "200m"
+              memory: "64Mi"
+
+

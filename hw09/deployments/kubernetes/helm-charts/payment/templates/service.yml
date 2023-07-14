@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  namespace: default
+  labels:
+    app: payment
+spec:
+  type: NodePort
+  ports:
+    - nodePort: 30002
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
+      name: payment
+  selector:
+    app: payment
+

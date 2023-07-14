@@ -1,0 +1,145 @@
+swagger: '2.0'
+info:
+  title: Order Service
+  version: 1.0.0
+
+host: example.domain
+basePath: /api/v1/
+schemes:
+  - http
+
+paths:
+
+  /order:
+    post:
+      operationId: postOrder
+      consumes:
+        - application/json
+      parameters:
+        - name: X-Request-ID
+          in: header
+          type: string
+          description: Idempotency key
+        - name: body
+          in: body
+          required: true
+          description: Order Request Body
+          schema:
+            $ref: '#/definitions/OrderBody'
+      responses:
+        200:
+          description: Order created
+          schema:
+            $ref: '#/definitions/OrderID'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /order/{id}:
+    parameters:
+      - description: Order id
+        in: path
+        name: id
+        required: true
+        type: integer
+        format: int64
+
+    delete:
+      operationId: deleteOrder
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        204:
+          description: Order deleted
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+
+    get:
+      operationId: getOrder
+      produces:
+        - application/json
+      parameters: []
+      responses:
+        200:
+          description: Order get
+          schema:
+            $ref: '#/definitions/OrderBody'
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      operationId: putOrder
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Order Request Body
+          schema:
+            $ref: '#/definitions/OrderBody'
+      responses:
+        200:
+          description: user updated
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Error'
+
+definitions:
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+
+  OrderBody:
+    description: Order Body
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+        format: email
+      total:
+        type: number
+        format: float32
+
+  OrderID:
+    description: Order ID
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+
+

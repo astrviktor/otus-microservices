@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orderservice
+  namespace: default
+  labels:
+    app: orderservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: orderservice
+  template:
+    metadata:
+      name: orderservice
+      labels:
+        app: orderservice
+    spec:
+      containers:
+        - name: orderservice
+          image: astrviktor/orderservice:1.0.1
+          env:
+            - name: ORDERSERVICE_SERVER_HOST
+              value: ""
+            - name: ORDERSERVICE_SERVER_PORT
+              value: "8000"
+            - name: ORDERSERVICE_STORAGE_HOST
+              value: "storage-postgresql"
+            - name: ORDERSERVICE_STORAGE_PORT
+              value: "5432"
+            - name: ORDERSERVICE_STORAGE_SCHEME
+              value: "orders"
+            - name: ORDERSERVICE_STORAGE_USER
+              value: "postgres"
+            - name: ORDERSERVICE_STORAGE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: storage-postgresql
+                  key: postgres-password
+            - name: ORDERSERVICE_PAYMENT_HOST
+              value: "payment"
+            - name: ORDERSERVICE_PAYMENT_PORT
+              value: "8001"
+            - name: ORDERSERVICE_WAREHOUSE_HOST
+              value: "warehouse"
+            - name: ORDERSERVICE_WAREHOUSE_PORT
+              value: "8002"
+            - name: ORDERSERVICE_DELIVERY_HOST
+              value: "delivery"
+            - name: ORDERSERVICE_DELIVERY_PORT
+              value: "8003"
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8000
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+            initialDelaySeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "16Mi"
+            limits:
+              cpu: "200m"
+              memory: "64Mi"
+
+
