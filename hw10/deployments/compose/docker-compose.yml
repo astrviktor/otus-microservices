@@ -1,0 +1,131 @@
+version: "2.1"
+
+services:
+  orderservice:
+    image: astrviktor/orderservice:1.0.2
+    container_name: orderservice
+    hostname: orderservice
+    ports:
+      - "8000:8000"
+    environment:
+      ORDERSERVICE_SERVER_HOST: ""
+      ORDERSERVICE_SERVER_PORT: "8000"
+      ORDERSERVICE_STORAGE_HOST: "postgres"
+      ORDERSERVICE_STORAGE_PORT: "5432"
+      ORDERSERVICE_STORAGE_SCHEME: "orders"
+      ORDERSERVICE_STORAGE_USER: "user"
+      ORDERSERVICE_STORAGE_PASSWORD: "password"
+      ORDERSERVICE_BILLING_HOST: "billing"
+      ORDERSERVICE_BILLING_PORT: "8001"
+      ORDERSERVICE_RABBITMQ_QUEUE: "notification"
+      ORDERSERVICE_RABBITMQ_HOST: "rabbit"
+      ORDERSERVICE_RABBITMQ_USER: "user"
+      ORDERSERVICE_RABBITMQ_PASSWORD: "password"
+      ORDERSERVICE_RABBITMQ_PORT: "5672"
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      docker:
+        aliases:
+          - orderservice
+
+  billing:
+    image: astrviktor/billing:1.0.4
+    container_name: billing
+    hostname: billing
+    ports:
+      - "8001:8001"
+    environment:
+      BILLING_SERVER_HOST: ""
+      BILLING_SERVER_PORT: "8001"
+      BILLING_STORAGE_HOST: "postgres"
+      BILLING_STORAGE_PORT: "5432"
+      BILLING_STORAGE_SCHEME: "orders"
+      BILLING_STORAGE_USER: "user"
+      BILLING_STORAGE_PASSWORD: "password"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      docker:
+        aliases:
+          - billing
+
+  notification:
+    image: astrviktor/notification:1.0.2
+    container_name: notification
+    hostname: notification
+    ports:
+      - "8002:8002"
+    environment:
+      NOTIFICATION_SERVER_HOST: ""
+      NOTIFICATION_SERVER_PORT: "8002"
+      NOTIFICATION_STORAGE_HOST: "postgres"
+      NOTIFICATION_STORAGE_PORT: "5432"
+      NOTIFICATION_STORAGE_SCHEME: "orders"
+      NOTIFICATION_STORAGE_USER: "user"
+      NOTIFICATION_STORAGE_PASSWORD: "password"
+      NOTIFICATION_RABBITMQ_QUEUE: "notification"
+      NOTIFICATION_RABBITMQ_HOST: "rabbit"
+      NOTIFICATION_RABBITMQ_USER: "user"
+      NOTIFICATION_RABBITMQ_PASSWORD: "password"
+      NOTIFICATION_RABBITMQ_PORT: "5672"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      docker:
+        aliases:
+          - notification
+
+  postgres:
+    image: postgres:15.1-bullseye
+    container_name: postgres
+    environment:
+      POSTGRES_DB: "orders"
+      POSTGRES_USER: "user"
+      POSTGRES_PASSWORD: "password"
+      TZ: 'UTC'
+      PGTZ: 'UTC'
+    volumes:
+      - volume_postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      docker:
+        aliases:
+          - postgres
+
+  rabbit:
+    image: rabbitmq:3.7.7-management
+    container_name: rabbit
+    hostname: rabbit
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      docker:
+        aliases:
+          - rabbit
+
+volumes:
+  volume_postgres:
+
+networks:
+  docker:
+    driver: bridge

@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification
+  namespace: default
+  labels:
+    app: notification
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      name: notification
+      labels:
+        app: notification
+    spec:
+      containers:
+        - name: notification
+          image: astrviktor/notification:1.0.2
+          env:
+            - name: NOTIFICATION_SERVER_HOST
+              value: ""
+            - name: NOTIFICATION_SERVER_PORT
+              value: "8002"
+            - name: NOTIFICATION_STORAGE_HOST
+              value: "storage-postgresql"
+            - name: NOTIFICATION_STORAGE_PORT
+              value: "5432"
+            - name: NOTIFICATION_STORAGE_SCHEME
+              value: "orders"
+            - name: NOTIFICATION_STORAGE_USER
+              value: "postgres"
+            - name: NOTIFICATION_STORAGE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: storage-postgresql
+                  key: postgres-password
+            - name: NOTIFICATION_RABBITMQ_QUEUE
+              value: "notification"
+            - name: NOTIFICATION_RABBITMQ_HOST
+              value: "rabbitmq"
+            - name: NOTIFICATION_RABBITMQ_USER
+              value: "user"
+            - name: NOTIFICATION_RABBITMQ_PASSWORD
+              value: "password"
+            - name: NOTIFICATION_RABBITMQ_PORT
+              value: "5672"
+          livenessProbe:
+            httpGet:
+              path: /health/
+              port: 8002
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8002
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+            initialDelaySeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "16Mi"
+            limits:
+              cpu: "200m"
+              memory: "64Mi"
+
+

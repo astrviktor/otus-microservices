@@ -1,0 +1,45 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor "User"
+participant "order"
+participant "broker"
+participant "billing"
+participant "notification"
+
+    "User" -> "billing" : Создание клиента
+    "billing" -> "User" : Клиент создан
+
+    "User" -> "billing" : Пополнение баланса
+    "billing" -> "User" : Баланс пополнен
+
+    "User" -> "order" : Создание заказа
+
+    "order" -> "broker" : Списание суммы заказа
+    "broker" -> "billing" : Списание суммы заказа
+    "billing" -> "broker" : Сумма списана
+    "broker" -> "order" : Сумма списана
+
+    "order" -> "broker" : Заказ успешно оплачен
+    "broker" -> "notification" : Заказ успешно оплачен
+    "order" -> "User" : Заказ создан
+
+    "notification" -> "User" : Заказ успешно оплачен
+
+alt #LightBlue недостаточно баланса
+
+    "User" -> "order" : Создание заказа
+
+    "order" -> "broker" : Списание суммы заказа
+    "broker" -> "billing" : Списание суммы заказа
+    "billing" -> "broker" : Недостаточно баланса
+    "broker" -> "order" : Недостаточно баланса
+
+    "order" -> "broker" : Недостаточно баланса
+    "broker" -> "notification" : Недостаточно баланса
+    "order" -> "User" : Заказ не создан
+
+    "notification" -> "User" : Недостаточно баланса
+end
+
+@enduml
